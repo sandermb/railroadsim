@@ -15,14 +15,22 @@ public class Train implements Runnable {
    private String name;
    private Integer speed;
    
-   private String state = "Idle";
+   private String state;
    
    private Integer count = 0;
    
-   Train(String trainName, Integer trainSpeed)
+   private TrainStation currentTrainStation = null;
+   private TrainTrack currentTrainTrack = null;
+   
+   
+   Train(String trainName, Integer trainSpeed, TrainStation startingTrainStation)
    {
        name = trainName;
        speed = trainSpeed;
+       
+       currentTrainStation = startingTrainStation;
+       currentTrainStation.addTrain(this);
+       state = "TrainStationIdle";
        
        System.out.println("Creating train: \"" +  name + "\" with speed " + speed);
    }
@@ -30,7 +38,7 @@ public class Train implements Runnable {
    public void run() 
    {
        try {
-           while(state != "Destroyed") {
+           while(!state.equals("Destroyed")) {
                performAction();
                Thread.sleep(1000); // Sleep 1 sec
            }
@@ -42,15 +50,18 @@ public class Train implements Runnable {
    
    private void performAction()
    {
+       System.out.println(name + " " + state);
        switch(state) {
-           case "Idle":
-               
+           case "TrainStationIdle":
+               TrainStationIdle();
        }
-       count++;
-        System.out.println(name + "Says: hi!");
-        if(count == 5) {
-            state = "Destroyed";
-        }
+       
+       state = "Destroyed";
+   }
+   
+   private void TrainStationIdle()
+   {       
+       System.out.println(name + " Do stuff!!");
    }
    
    public void start ()
