@@ -45,7 +45,7 @@ public class Train implements Runnable {
        } catch (InterruptedException e) {
            System.out.println("Thread " +  name + " interrupted.");
        }
-       System.out.println(name + " destroyed.");
+       System.out.println(name + " Destroyed.");
    }
    
    private void performAction()
@@ -54,14 +54,55 @@ public class Train implements Runnable {
        switch(state) {
            case "TrainStationIdle":
                TrainStationIdle();
+               break;
+           case "LeavingStation":
+               leaveStation();
+               break;
+           case "LoadingCargo":
+               loadCargo();
+               break;
        }
        
-       state = "Destroyed";
+       //state = "Destroyed";
    }
    
    private void TrainStationIdle()
    {       
        System.out.println(name + " Do stuff!!");
+       
+       //Is the train full?
+       if(isFull()) {
+           //Yes -> Leave station
+           state = "LeavingStation";
+       } else {
+            //No -> Is there cargo at this station?
+            if(currentTrainStation.hasCargo()) {
+                //Yes -> Load cargo
+                state = "LoadingCargo";
+            } else {
+                //No -> Leave station
+                state = "LeavingStation";
+            }
+       }
+   }
+   
+   public void loadCargo()
+   {
+       System.out.println(name + " Loading cargo...");
+   }
+   
+   public void leaveStation()
+   {
+       System.out.println(name + " Leaving station...");
+       
+       //Is there a train on the track ahead?
+                //Yes -> stay idle
+                //No -> Enter track
+   }
+   
+   private Boolean isFull()
+   {
+       return false;
    }
    
    public void start ()

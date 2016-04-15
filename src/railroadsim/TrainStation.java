@@ -19,6 +19,7 @@ public class TrainStation {
     private TrainTrack trackToNextStation;
     
     private List<Train> trainsInStation = new ArrayList<Train>();
+    
         
     TrainStation(String stationName) 
     {
@@ -47,6 +48,11 @@ public class TrainStation {
         
         trainsInStation.add(train);
         
+        return true;
+    }
+    
+    public Boolean hasCargo()
+    {
         return true;
     }
 }
