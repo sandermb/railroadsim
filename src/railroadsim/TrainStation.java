@@ -19,6 +19,7 @@ public class TrainStation {
     private TrainTrack trackToNextStation;
     
     private List<Train> trainsInStation = new ArrayList<Train>();
+    private List<Cargo> cargoInStation = new ArrayList<Cargo>();
     
         
     TrainStation(String stationName) 
@@ -51,9 +52,29 @@ public class TrainStation {
         return true;
     }
     
-    public Boolean hasCargo()
+    public Boolean hasCargoSmallerThan(Integer cargoSizeMax)
     {
+        for (Cargo cargo : cargoInStation) {
+            if(cargo.getSize() <= cargoSizeMax) {
+                return true;
+            }
+        }
+        
         return false;
+    }
+    
+    public Cargo getCargoSmallerThan(Integer cargoSizeMax)
+    {
+        Cargo currentCargo = null;
+        
+        for (Cargo cargo : cargoInStation) {
+            if(cargo.getSize() <= cargoSizeMax && (currentCargo == null || cargo.getSize() > currentCargo.getSize())) {
+                currentCargo = cargo;
+            }
+        }
+        
+        cargoInStation.remove(currentCargo);
+        return currentCargo;
     }
     
     public TrainTrack leaveStation(Train train)
@@ -66,5 +87,10 @@ public class TrainStation {
         }
         
         return null;
+    }
+    
+    public void addCargo(Cargo cargo)
+    {
+        cargoInStation.add(cargo);
     }
 }

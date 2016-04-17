@@ -23,6 +23,7 @@ public class RailRoad {
         System.out.println("Creating RailRoad");
         
         createStations(numberOfStations);    
+        createCargoDropper();
         createTrains(numberOfTrains);
         
         start();
@@ -42,13 +43,20 @@ public class RailRoad {
         Random randomGenerator = new Random();
         for(int i=1;i<=numberOfTrains;i++) {
             Integer randomSpeed = randomGenerator.nextInt((Config.trainSpeedMax - Config.trainSpeedMin) +1)+Config.trainSpeedMin;
+            Integer randomCapacity = randomGenerator.nextInt((Config.trainCapacityMax - Config.trainCapacityMin) +1)+Config.trainCapacityMin;
             
             Integer index = randomGenerator.nextInt(trainStations.size());
             TrainStation trainStation = trainStations.get(index);
             
-            Train train = new Train("Train " + i, randomSpeed, trainStation);
+            Train train = new Train("Train " + i, randomSpeed, randomCapacity, trainStation);
             trains.add(train);
         }
+    }
+    
+    private void createCargoDropper()
+    {
+        CargoDropper cargoDropper = new CargoDropper(trainStations);
+        cargoDropper.start();
     }
     
     private void createStations(Integer numberOfStations) 
