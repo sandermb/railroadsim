@@ -11,7 +11,7 @@ package railroadsim;
  */
 public class Config {
     public static Integer numberOfStations = 2; // 8
-    public static Integer numberOfTrains = 0; // 4
+    public static Integer numberOfTrains = 1; // 4
     
     public static Integer trainSpeedMin = 10;
     public static Integer trainSpeedMax = 50;

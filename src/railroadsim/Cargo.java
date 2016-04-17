@@ -13,9 +13,12 @@ import java.util.Random;
  */
 public class Cargo {
     private Integer size;
+    private TrainStation desitination;
     
-    Cargo()
+    Cargo(TrainStation cargoDestinationTrainStation)
     {
+        desitination = cargoDestinationTrainStation;
+        
         Random randomGenerator = new Random();
         size = randomGenerator.nextInt((Config.droppedCargoSizeMax - Config.droppedCargoSizeMin) +1)+Config.droppedCargoSizeMin;
     }
@@ -28,5 +31,10 @@ public class Cargo {
     public void setSize(Integer cargoSize)
     {
         size = cargoSize;
+    }
+    
+    public TrainStation getDestination()
+    {
+        return desitination;
     }
 }

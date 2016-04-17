@@ -24,15 +24,23 @@ public class CargoDropper implements Runnable {
    
    public void dropCargo()
    {
-       Cargo cargo = new Cargo();
-       
        Random randomGenerator = new Random();
+       
        Integer index = randomGenerator.nextInt(trainStations.size());
-       TrainStation trainStation = trainStations.get(index);
+       TrainStation destinationTrainStation = trainStations.get(index);
        
-       trainStation.addCargo(cargo);
+       Cargo cargo = new Cargo(destinationTrainStation);
        
-       System.out.println("Dropping cargo (size " + cargo.getSize() + ") at " + trainStation.getName());
+       TrainStation startingTrainStation = null;
+       
+       while(startingTrainStation == null || startingTrainStation == destinationTrainStation) {
+           index = randomGenerator.nextInt(trainStations.size());
+           startingTrainStation = trainStations.get(index);
+       }
+       
+       startingTrainStation.addCargo(cargo);
+       
+       System.out.println("Dropping cargo (size " + cargo.getSize() + ") at " + startingTrainStation.getName() + " with destination " + destinationTrainStation.getName());
        
        try {
            Thread.sleep(Config.droppingCargoRate * 1000);

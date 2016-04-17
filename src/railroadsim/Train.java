@@ -5,6 +5,9 @@
  */
 package railroadsim;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author Sander
@@ -21,6 +24,8 @@ public class Train implements Runnable {
    
    private TrainStation currentTrainStation = null;
    private TrainTrack currentTrainTrack = null;
+   
+   private List<Cargo> cargoInTrain = new ArrayList<Cargo>();
    
    
    Train(String trainName, Integer trainSpeed, TrainStation startingTrainStation)
@@ -66,7 +71,10 @@ public class Train implements Runnable {
            case "LoadingCargo":
                loadCargo();
                break;
-            case "OnTrack":
+           case "UnloadingCargo":
+               unloadCargo();
+               break;
+           case "OnTrack":
                driveOnTrack();
                break;   
        }
@@ -76,7 +84,10 @@ public class Train implements Runnable {
    
    private void IdleAtTrainStation()
    {
-       if(isFull()) { //Is the train full?
+       if(hasCargoForCurrentStation()) { //Is there cargo in the train for this station?
+           //Yes -> Unload that cargo
+           state = "UnloadingCargo";
+       } else if(isFull()) { //Is the train full?
            //Yes -> Leave station
            state = "LeavingStation";
        } else if(currentTrainStation.hasCargo()) { //No -> Is there cargo at this station?
@@ -88,9 +99,26 @@ public class Train implements Runnable {
        }
    }
    
+   public void unloadCargo()
+   {
+       System.out.println(name + " Unloading cargo at " + currentTrainStation.getName());
+       
+       for (Cargo cargo : cargoInTrain) {
+           if(cargo.getDestination() == currentTrainStation) {
+               for(Integer i=0;i<cargo.getSize();i++) {
+                   System.out.println(name + " Unloading cargo: " + ((cargo.getSize()*100) / (i*100)) + "%");
+                   takeTime(Config.droppingCargoTime * 1000);
+               }
+               System.out.println(name + " Unloading cargo: 100%");
+               
+               cargoInTrain.remove(cargo);
+           }
+       }
+   }
+   
    public void loadCargo()
    {
-       System.out.println(name + " Loading cargo...");
+       System.out.println(name + " Loading cargo at " + currentTrainStation.getName());
    }
    
    public void leaveStation()
@@ -133,6 +161,17 @@ public class Train implements Runnable {
    
    private Boolean isFull()
    {
+       return false;
+   }
+   
+   private Boolean hasCargoForCurrentStation()
+   {
+       for (Cargo cargo : cargoInTrain) {
+           if(cargo.getDestination() == currentTrainStation) {
+               return true;
+           }
+       }
+       
        return false;
    }
    
