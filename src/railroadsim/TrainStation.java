@@ -19,6 +19,7 @@ public class TrainStation {
     private TrainTrack trackToNextStation;
     
     private List<Train> trainsInStation = new ArrayList<Train>();
+    private List<Cargo> cargoInStation = new ArrayList<Cargo>();
     
         
     TrainStation(String stationName) 
@@ -66,5 +67,10 @@ public class TrainStation {
         }
         
         return null;
+    }
+    
+    public void addCargo(Cargo cargo)
+    {
+        cargoInStation.add(cargo);
     }
 }

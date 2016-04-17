@@ -23,6 +23,7 @@ public class RailRoad {
         System.out.println("Creating RailRoad");
         
         createStations(numberOfStations);    
+        createCargoDropper();
         createTrains(numberOfTrains);
         
         start();
@@ -49,6 +50,12 @@ public class RailRoad {
             Train train = new Train("Train " + i, randomSpeed, trainStation);
             trains.add(train);
         }
+    }
+    
+    private void createCargoDropper()
+    {
+        CargoDropper cargoDropper = new CargoDropper(trainStations);
+        cargoDropper.start();
     }
     
     private void createStations(Integer numberOfStations) 
