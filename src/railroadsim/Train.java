@@ -17,10 +17,9 @@ public class Train implements Runnable {
    
    private String name;
    private Integer speed;
+   private Integer capacity;
    
    private String state;
-   
-   private Integer count = 0;
    
    private TrainStation currentTrainStation = null;
    private TrainTrack currentTrainTrack = null;
@@ -28,10 +27,11 @@ public class Train implements Runnable {
    private List<Cargo> cargoInTrain = new ArrayList<Cargo>();
    
    
-   Train(String trainName, Integer trainSpeed, TrainStation startingTrainStation)
+   Train(String trainName, Integer trainSpeed, Integer trainCapacity, TrainStation startingTrainStation)
    {
        name = trainName;
        speed = trainSpeed;
+       capacity = trainCapacity;
        
        currentTrainStation = startingTrainStation;
        currentTrainStation.addTrain(this);
@@ -65,9 +65,6 @@ public class Train implements Runnable {
            case "IdleAtTrainStation":
                IdleAtTrainStation();
                break;
-           case "LeavingStation":
-               leaveStation();
-               break;
            case "LoadingCargo":
                loadCargo();
                break;
@@ -87,11 +84,8 @@ public class Train implements Runnable {
        if(hasCargoForCurrentStation()) { //Is there cargo in the train for this station?
            //Yes -> Unload that cargo
            state = "UnloadingCargo";
-       } else if(isFull()) { //Is the train full?
+       } else if(ableToLoadCargo()) { //Is the train able to load more cargo from this station?
            //Yes -> Leave station
-           state = "LeavingStation";
-       } else if(currentTrainStation.hasCargo()) { //No -> Is there cargo at this station?
-           //Yes -> Load cargo
            state = "LoadingCargo";
        } else {
            //No -> Try to leave station once
@@ -105,20 +99,34 @@ public class Train implements Runnable {
        
        for (Cargo cargo : cargoInTrain) {
            if(cargo.getDestination() == currentTrainStation) {
-               for(Integer i=0;i<cargo.getSize();i++) {
-                   System.out.println(name + " Unloading cargo: " + ((cargo.getSize()*100) / (i*100)) + "%");
+               for(Integer i=1;i<=cargo.getSize();i++) {
                    takeTime(Config.droppingCargoTime * 1000);
+                   System.out.println(name + " Unloading cargo: " + (10000 / ((cargo.getSize()*100) / i)) + "%");
                }
-               System.out.println(name + " Unloading cargo: 100%");
                
                cargoInTrain.remove(cargo);
+               break;
            }
        }
+       
+       state = "IdleAtTrainStation";
    }
    
    public void loadCargo()
    {
        System.out.println(name + " Loading cargo at " + currentTrainStation.getName());
+       
+       Cargo cargo = currentTrainStation.getCargoSmallerThan(getCapacityAvailable());
+       
+       if(cargo != null) {
+           for(Integer i=1;i<=cargo.getSize();i++) {
+               takeTime(Config.loadingCargoTime * 1000);
+               System.out.println(name + " Loading cargo: " + (10000 / ((cargo.getSize()*100) / i)) + "%");
+           }
+           
+           cargoInTrain.add(cargo);
+           state = "IdleAtTrainStation";
+       }
    }
    
    public void leaveStation()
@@ -159,9 +167,20 @@ public class Train implements Runnable {
        }
    }
    
-   private Boolean isFull()
+   private Boolean ableToLoadCargo()
    {
-       return false;
+       return currentTrainStation.hasCargoSmallerThan(getCapacityAvailable());
+   }
+   
+   private Integer getCapacityAvailable()
+   {
+       Integer capacityAvailable = capacity;
+       
+       for (Cargo cargo : cargoInTrain) {
+           capacityAvailable -= cargo.getSize();
+       }
+       
+       return capacityAvailable;
    }
    
    private Boolean hasCargoForCurrentStation()
