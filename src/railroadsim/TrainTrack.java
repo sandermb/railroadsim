@@ -14,6 +14,7 @@ public class TrainTrack {
     private TrainStation toStation;
     
     private Integer length;
+    private Integer trainPositionOnTrack = 0;
     
     private Train currentTrainOnTrack = null;
     
@@ -28,14 +29,17 @@ public class TrainTrack {
     
     public Boolean addTrainToTrack(Train train)
     {
+        //Is there a train already on this track?
         if(currentTrainOnTrack == null) {
             currentTrainOnTrack = train;
+            trainPositionOnTrack = 0;
             
             System.out.println(currentTrainOnTrack.getName() + " enters track between " + fromStation.getName() + " and " + toStation.getName());
             return true;
+        } else {
+            System.out.println(train.getName() + " cannot enter track between " + fromStation.getName() + " and " + toStation.getName() + " because " + currentTrainOnTrack.getName() + " is on the track.");
+            return false;
         }
-            
-        return false;
     }
     
     public Boolean removeTrainFromTrack()
@@ -43,9 +47,35 @@ public class TrainTrack {
         if(currentTrainOnTrack != null) {
             System.out.println(currentTrainOnTrack.getName() + " leaves track between " + fromStation.getName() + " and " + toStation.getName());
             currentTrainOnTrack = null; 
+            trainPositionOnTrack = 0;
             return true;
         }
         
         return false;
+    }
+    
+    public Integer distanceUntilEnd()
+    {
+        return length - trainPositionOnTrack;
+    }
+    
+    public void drive(Integer distance) 
+    {
+        trainPositionOnTrack+=distance;
+        System.out.println(currentTrainOnTrack.getName() + " distance covered: " + trainPositionOnTrack + "km");
+    }
+    
+    public Boolean reachedStation()
+    {
+        if(trainPositionOnTrack == length) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    public TrainStation getToStation()
+    {
+        return toStation;
     }
 }
