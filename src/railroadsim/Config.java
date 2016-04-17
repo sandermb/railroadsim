@@ -16,6 +16,6 @@ public class Config {
     public static Integer trainSpeedMin = 10;
     public static Integer trainSpeedMax = 50;
     
-    public static Integer trackDistanceMin = 1;
+    public static Integer trackDistanceMin = 4;
     public static Integer trackDistanceMax = 10;
 }

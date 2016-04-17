@@ -34,7 +34,7 @@ public class TrainStation {
         
         Random randomGenerator = new Random();
         Integer randomLength = randomGenerator.nextInt((Config.trackDistanceMax - Config.trackDistanceMin) +1)+Config.trackDistanceMin;
-        TrainTrack trainTrack = new TrainTrack(randomLength, this, nextTrainStation);
+        trackToNextStation = new TrainTrack(randomLength, this, nextTrainStation);
     }
     
     public String getName()
@@ -53,6 +53,18 @@ public class TrainStation {
     
     public Boolean hasCargo()
     {
-        return true;
+        return false;
+    }
+    
+    public TrainTrack leaveStation(Train train)
+    {
+        //Can I enter the track to the next station?
+        if(trackToNextStation.addTrainToTrack(train)) {
+            System.out.println(train.getName() + " left " +  name);
+            trainsInStation.remove(train);
+            return trackToNextStation;
+        }
+        
+        return null;
     }
 }

@@ -30,30 +30,35 @@ public class Train implements Runnable {
        
        currentTrainStation = startingTrainStation;
        currentTrainStation.addTrain(this);
-       state = "TrainStationIdle";
+       state = "IdleAtTrainStation";
        
        System.out.println("Creating train: \"" +  name + "\" with speed " + speed);
    }
    
    public void run() 
    {
+       while(!state.equals("Destroyed")) {
+           performAction();
+       }
+       
+       System.out.println(name + " Destroyed.");
+   }
+   
+   public void takeTime(Integer miliseconds)
+   {
        try {
-           while(!state.equals("Destroyed")) {
-               performAction();
-               Thread.sleep(1000); // Sleep 1 sec
-           }
+           Thread.sleep(miliseconds); // Sleep 1 sec
        } catch (InterruptedException e) {
            System.out.println("Thread " +  name + " interrupted.");
        }
-       System.out.println(name + " Destroyed.");
    }
    
    private void performAction()
    {
        System.out.println(name + " " + state);
        switch(state) {
-           case "TrainStationIdle":
-               TrainStationIdle();
+           case "IdleAtTrainStation":
+               IdleAtTrainStation();
                break;
            case "LeavingStation":
                leaveStation();
@@ -61,28 +66,25 @@ public class Train implements Runnable {
            case "LoadingCargo":
                loadCargo();
                break;
+            case "OnTrack":
+               driveOnTrack();
+               break;   
        }
        
        //state = "Destroyed";
    }
    
-   private void TrainStationIdle()
-   {       
-       System.out.println(name + " Do stuff!!");
-       
-       //Is the train full?
-       if(isFull()) {
+   private void IdleAtTrainStation()
+   {
+       if(isFull()) { //Is the train full?
            //Yes -> Leave station
            state = "LeavingStation";
+       } else if(currentTrainStation.hasCargo()) { //No -> Is there cargo at this station?
+           //Yes -> Load cargo
+           state = "LoadingCargo";
        } else {
-            //No -> Is there cargo at this station?
-            if(currentTrainStation.hasCargo()) {
-                //Yes -> Load cargo
-                state = "LoadingCargo";
-            } else {
-                //No -> Leave station
-                state = "LeavingStation";
-            }
+           //No -> Try to leave station once
+           leaveStation();
        }
    }
    
@@ -93,11 +95,40 @@ public class Train implements Runnable {
    
    public void leaveStation()
    {
-       System.out.println(name + " Leaving station...");
+       System.out.println(name + " Leaving station (" + currentTrainStation.getName() + ")...");
        
-       //Is there a train on the track ahead?
-                //Yes -> stay idle
-                //No -> Enter track
+       //Can I leave the station?
+       TrainTrack traintrack = currentTrainStation.leaveStation(this);
+       if(traintrack != null) {
+           currentTrainTrack = traintrack;
+           currentTrainStation = null;
+           state = "OnTrack";
+       } else {
+           System.out.println(name + " waits until tracks is clear");
+           takeTime(1000);
+       }
+   }
+   
+   public void driveOnTrack()
+   {
+       System.out.println(name + " Driving on track...");
+       
+       Integer distanceUntilNextStation = currentTrainTrack.distanceUntilEnd();
+       for(Integer i=0;i<distanceUntilNextStation;i++) {
+           takeTime(60000 / speed);
+           currentTrainTrack.drive(1);
+       }
+       
+       if(currentTrainTrack.reachedStation()) {
+           currentTrainTrack.removeTrainFromTrack();
+           
+           currentTrainStation = currentTrainTrack.getToStation();
+           currentTrainTrack = null;
+           
+           state = "IdleAtTrainStation";
+           
+           System.out.println(name + " reached " + currentTrainStation.getName());
+       }
    }
    
    private Boolean isFull()
